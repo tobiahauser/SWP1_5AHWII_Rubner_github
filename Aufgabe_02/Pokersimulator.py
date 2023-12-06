@@ -141,7 +141,7 @@ def highcard(cards):
         return counter  #Es wurde eine HighCard gefunden
     return counter
 
-play = 100000
+play = 100000 #Spiele 100000 mal
 highcard_counter = 0
 pair_counter = 0
 twopairs_counter = 0
@@ -154,8 +154,8 @@ straightflush_counter = 0
 royalflush_counter = 0
 
 for _ in range(play):
-    random_cards = pickOneCard(gamecards, 5)
-    sorted_cards = sorted(random_cards, key=lambda x: x[1])
+    random_cards = pickOneCard(gamecards, 5) #Hole 5 Zufallszahlen
+    sorted_cards = sorted(random_cards, key=lambda x: x[1]) #Katen sortieren
     highcard_counter += highcard(sorted_cards)
     twopairs_counter += twopairs(sorted_cards)
     if twopairs(sorted_cards) == 0:

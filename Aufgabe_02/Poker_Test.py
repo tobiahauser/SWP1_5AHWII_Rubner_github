@@ -1,6 +1,8 @@
 import unittest
 import Pokersimulator
 
+#es werden 3 Methoden getestet und ob pickOneCard stimmt
+
 class TestKartenspiel(unittest.TestCase):
     gamecards = []
 
