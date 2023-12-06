@@ -24,36 +24,30 @@ class TestKartenspiel(unittest.TestCase):
     def test_pairs(self):
         random_cards = Pokersimulator.pickOneCard(self.gamecards, 1)
         sorted_cards = sorted(random_cards, key=lambda x: x[1])
-        pair_combination, pair_counter = Pokersimulator.pairs(sorted_cards,0)
-        if pair_combination:
-            self.assertTrue(pair_combination)
+        pair_counter = Pokersimulator.pairs(sorted_cards)
+        if pair_counter == 1:
             self.assertEqual(pair_counter, 1)
-        if pair_combination == 0:
-            self.assertFalse(pair_combination)
+        if pair_counter == 0:
             self.assertEqual(pair_counter, 0)
         pass
 
     def test_drilling(self):
         random_cards = Pokersimulator.pickOneCard(self.gamecards, 1)
         sorted_cards = sorted(random_cards, key=lambda x: x[1])
-        drilling_combination, drilling_counter = Pokersimulator.drilling(sorted_cards, 0)
-        if drilling_combination:
-            self.assertTrue(drilling_combination)
+        drilling_counter = Pokersimulator.drilling(sorted_cards)
+        if drilling_counter == 1:
             self.assertEqual(drilling_counter, 1)
-        if drilling_combination == 0:
-            self.assertFalse(drilling_combination)
+        if drilling_counter == 0:
             self.assertEqual(drilling_counter, 0)
         pass
 
     def test_twopairs(self):
         random_cards = Pokersimulator.pickOneCard(self.gamecards, 1)
         sorted_cards = sorted(random_cards, key=lambda x: x[1])
-        twopairs_combination, twopairs_counter = Pokersimulator.twopairs(sorted_cards, 0)
-        if twopairs_combination:
-            self.assertTrue(twopairs_combination)
+        twopairs_counter = Pokersimulator.twopairs(sorted_cards)
+        if twopairs_counter == 1:
             self.assertEqual(twopairs_counter, 1)
-        if twopairs_combination == 0:
-            self.assertFalse(twopairs_combination)
+        if twopairs_counter == 0:
             self.assertEqual(twopairs_counter, 0)
         pass
 
