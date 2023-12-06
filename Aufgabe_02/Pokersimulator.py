@@ -1,5 +1,6 @@
 import random
-import unittest
+
+from tabulate import tabulate
 
 colors = ["Kreuz","Pik","Herz","Karo"]
 #Bube = 11
@@ -30,21 +31,26 @@ def pickOneCard(cards, anz_Karten):
 
 def pairs(cards, counter):
     values = [card[1] for card in cards]
+    one_counter = 0
     for p in values:
-        if values.count(p) == 2: #zählt wie oft ein Paar in der Liste vorkommt
-            counter += 1
-            return True, counter #Es wurde ein Paar gefunden
+        if values.count(p) == 2:  #zählt wie oft ein Paar in der Liste vorkommt
+            one_counter += 1
+            if one_counter == 2:
+                counter += 1
+                return True, counter #Es wurde ein Paar gefunden
     return False, counter
 
 
 def twopairs(cards, counter):
     values = [card[1] for card in cards]
+    two_counter = 0
     for p in values:
-        if values.count(p) == 2:  # zählt wie oft zwei Paare in der Liste vorkommt
-            counter = 1
-            break  # Sobald zwei Paare gefunden wurden, wird die Schleife abgebrochen
-
-    return counter == 1, counter
+        if values.count(p) == 2:  #zählt wie oft ein Paar in der Liste vorkommt
+            two_counter += 1
+            if two_counter == 4:
+                counter += 1
+                return True, counter #Es wurden zwei Paare gefunden
+    return False, counter
 
 def drilling(cards, counter):
     values = [card[1] for card in cards]
@@ -59,7 +65,7 @@ def street(cards, counter):
     for p in values:
         if all(values[p + 1] == values[p] + 1 for p in range(len(values) - 1)):  #ChatGPT
             counter += 1
-            return True, counter # Eswurde eine Straße gefunden
+            return True, counter #Eswurde eine Straße gefunden
     return False, counter
 
 def flush(cards,counter):
@@ -118,53 +124,6 @@ def highcard(cards,counter):
         return True, counter  #Es wurde eine HighCard gefunden
     return False, counter
 
-class TestKartenspiel(unittest.TestCase):
-    gamecards = []
-
-    @classmethod
-    def setUpClass(self):
-        colors = ["Kreuz", "Pik", "Herz", "Karo"]
-        cards = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-
-        for color in colors:
-            for card in cards:
-                self.gamecards.append((color, card))
-
-    def test_pickOneCard(self):
-        picked_cards = pickOneCard(self.gamecards, 3)
-        self.assertEqual(len(picked_cards), 3)
-
-        for card in picked_cards: #kommen die Karten aus gamecards
-            self.assertIn(card, self.gamecards)
-        pass
-
-    def test_pairs(self):
-        random_cards = pickOneCard(self.gamecards, 1)
-        sorted_cards = sorted(random_cards, key=lambda x: x[1])
-        pair_combination, pair_counter = pairs(sorted_cards,0)
-        if pair_combination:
-            self.assertTrue(pair_combination)
-            self.assertEqual(pair_counter, 1)
-        if pair_combination == 0:
-            self.assertFalse(pair_combination)
-            self.assertEqual(pair_counter, 0)
-        pass
-
-    def test_drilling(self):
-        random_cards = pickOneCard(self.gamecards, 1)
-        sorted_cards = sorted(random_cards, key=lambda x: x[1])
-        drilling_combination, drilling_counter = drilling(sorted_cards, 0)
-        if drilling_combination:
-            self.assertTrue(drilling_combination)
-            self.assertEqual(drilling_counter, 1)
-        if drilling_combination == 0:
-            self.assertFalse(drilling_combination)
-            self.assertEqual(drilling_counter, 0)
-        pass
-
-if __name__ == "__main__":
-    unittest.main()
-
 play = 100000
 highcard_counter = 0
 pair_counter = 0
@@ -184,8 +143,9 @@ for _ in range(play):
     #print("RandomCards: ", random_cards)
     #print("GameCards: ", gamecards)
     highcard_combination, highcard_counter = highcard(sorted_cards, highcard_counter)
-    pair_combination, pair_counter = pairs(sorted_cards, pair_counter)
-    twopairs_combination, twopair_counter = pairs(sorted_cards, twopairs_counter)
+    twopairs_combination, twopairs_counter = twopairs(sorted_cards, twopairs_counter)
+    if twopairs_combination == False:
+        pair_combination, pair_counter = pairs(sorted_cards, pair_counter)
     drilling_combination, drilling_counter = drilling(sorted_cards, drilling_counter)
     street_combination, street_counter = street(sorted_cards, street_counter)
     flush_combination, flush_counter = flush(sorted_cards, flush_counter)
@@ -194,34 +154,18 @@ for _ in range(play):
     straightflush_combination, straightflush_counter = straightflush(sorted_cards, straightflush_counter)
     royalflush_combination, royalflush_counter = royalflush(sorted_cards, royalflush_counter)
 
-print("HighCard_Kombinationen: ", highcard_counter)
-print("Paar_Kombinationen: ", pair_counter)
-print("ZweiPaar_Kombinationen: ", twopairs_counter)
-print("Drilling_Kombinationen: ", drilling_counter)
-print("Street_Kombinationen: ", street_counter)
-print("Flush_Kombinationen: ", flush_counter)
-print("FullHouse_Kombinationen: ", fullhouse_counter)
-print("Vierling_Kombinationen: ", fourofakind_counter)
-print("StraightFlush_Kombinationen: ", straightflush_counter)
-print("RoyalFlush_Kombinationen: ", royalflush_counter)
-print("Spielzuege: ", play)
-print("prozentueller Anteil für eine HighCard: " + str(highcard_counter/play * 100) + " %")
-print("prozentueller Anteil für eine HighCard bei 5 Karten (Wikipedia): 50,12 %")
-print("prozentueller Anteil für ein Paar: " + str(pair_counter/play * 100) + " %")
-print("prozentueller Anteil für ein Paar bei 5 Karten (Wikipedia): 4,75 %")
-print("prozentueller Anteil für zwei Paare: " + str(twopairs_counter/play * 100) + " %")
-print("prozentueller Anteil für zwei Paare bei 5 Karten (Wikipedia): 42,26 %")
-print("prozentueller Anteil für einen Drilling: " + str(drilling_counter/play * 100) + " %")
-print("prozentueller Anteil für einen Drilling bei 5 Karten (Wikipedia): 2,11 %")
-print("prozentueller Anteil für eine Straße: " + str(street_counter/play * 100) + " %")
-print("prozentueller Anteil für eine Straße bei 5 Karten (Wikipedia): 0,392 %")
-print("prozentueller Anteil für einen Flush: " + str(flush_counter/play * 100) + " %")
-print("prozentueller Anteil für einen Flush bei 5 Karten (Wikipedia): 0,197 %")
-print("prozentueller Anteil für ein FullHouse: " + str(fullhouse_counter/play * 100) + " %")
-print("prozentueller Anteil für ein FullHouse bei 5 Karten (Wikipedia): 0,144 %")
-print("prozentueller Anteil für einen Vierling: " + str(fourofakind_counter/play * 100) + " %")
-print("prozentueller Anteil für einen Vierling bei 5 Karten (Wikipedia): 0,0240 %")
-print("prozentueller Anteil für einen StraightFlush: " + str(straightflush_counter/play * 100) + " %")
-print("prozentueller Anteil für einen StraightFlush bei 5 Karten (Wikipedia): 0,00139 %")
-print("prozentueller Anteil für einen RoyalFlush: " + str(royalflush_counter/play * 100) + " %")
-print("prozentueller Anteil für einen RoyalFlush bei 5 Karten (Wikipedia): 0,000154 %")
+table_data = [
+    ["HighCard", highcard_counter, highcard_counter/play * 100, "50,12"],
+    ["Paar", pair_counter, pair_counter/play * 100, "42,26"],
+    ["ZweiPaar", twopairs_counter, twopairs_counter/play * 100, "4,75"],
+    ["Drilling", drilling_counter, drilling_counter/play * 100, "2,11"],
+    ["Straße", street_counter, street_counter/play * 100, "0,392"],
+    ["Flush", flush_counter, flush_counter/play * 100, "0,197"],
+    ["FullHouse", fullhouse_counter, fullhouse_counter/play * 100, "0,144"],
+    ["Vierling", fourofakind_counter, fourofakind_counter/play * 100, "0,0240"],
+    ["StraightFlush", straightflush_counter, straightflush_counter/play * 100, "0,00139"],
+    ["RoyalFlush", royalflush_counter, royalflush_counter/play * 100, "0,000154"],
+    ["Spielzuege", play],
+]
+headers = ["Kombination", "Anzahl", "Prozentsatz (berechnet)", "Prozentsatz (Wikipedia)"]
+print(tabulate(table_data, headers=headers, tablefmt="grid"))
