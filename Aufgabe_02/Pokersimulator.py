@@ -1,13 +1,16 @@
 import random
 from tabulate import tabulate
+import functools
+import time
+
 
 #Beispiel für count:
-values = [2, 4, 6, 2, 8, 10, 4]
-for p in values:
-    if values.count(p) == 2:
-        print("Paar")
-    else:
-        print("Kein Paar")
+#values = [2, 4, 6, 2, 8, 10, 4]
+#for p in values:
+#    if values.count(p) == 2:
+#        print("Paar")
+#    else:
+#        print("Kein Paar")
 
 colors = ["Kreuz","Pik","Herz","Karo"]
 #Bube = 11
@@ -141,46 +144,61 @@ def highcard(cards):
         return counter  #Es wurde eine HighCard gefunden
     return counter
 
-play = 100000 #Spiele 100000 mal
-highcard_counter = 0
-pair_counter = 0
-twopairs_counter = 0
-drilling_counter = 0
-street_counter = 0
-flush_counter = 0
-fullhouse_counter = 0
-fourofakind_counter = 0
-straightflush_counter = 0
-royalflush_counter = 0
+def timer(func):
+    @functools.wraps(func)
+    def wrapper_timer(*args, **kwargs):
+        start_time = time.perf_counter()
+        value = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        run_time = end_time - start_time
+        print(f"Finished {func.__name__!r} in {run_time:.4f} secs")
+        return value
+    return wrapper_timer
 
-for _ in range(play):
-    random_cards = pickOneCard(gamecards, 5) #Hole 5 Zufallszahlen
-    sorted_cards = sorted(random_cards, key=lambda x: x[1]) #Katen sortieren
-    highcard_counter += highcard(sorted_cards)
-    twopairs_counter += twopairs(sorted_cards)
-    if twopairs(sorted_cards) == 0:
-        pair_counter += pairs(sorted_cards)
-    drilling_counter += drilling(sorted_cards)
-    street_counter += street(sorted_cards)
-    flush_counter += flush(sorted_cards)
-    fullhouse_counter += fullhouse(sorted_cards)
-    fourofakind_counter += fourofakind(sorted_cards)
-    straightflush_counter += straightflush(sorted_cards)
-    royalflush_counter += royalflush(sorted_cards)
+@timer
+def play_methode(play):
+    highcard_counter = 0
+    pair_counter = 0
+    twopairs_counter = 0
+    drilling_counter = 0
+    street_counter = 0
+    flush_counter = 0
+    fullhouse_counter = 0
+    fourofakind_counter = 0
+    straightflush_counter = 0
+    royalflush_counter = 0
 
-    if _ == play - 1:
-        table_data = [
-            ["HighCard", highcard_counter, highcard_counter/play * 100, "50,12"],
-            ["Paar", pair_counter, pair_counter/play * 100, "42,26"],
-            ["ZweiPaar", twopairs_counter, twopairs_counter/play * 100, "4,75"],
-            ["Drilling", drilling_counter, drilling_counter/play * 100, "2,11"],
-            ["Straße", street_counter, street_counter/play * 100, "0,392"],
-            ["Flush", flush_counter, flush_counter/play * 100, "0,197"],
-            ["FullHouse", fullhouse_counter, fullhouse_counter/play * 100, "0,144"],
-            ["Vierling", fourofakind_counter, fourofakind_counter/play * 100, "0,0240"],
-            ["StraightFlush", straightflush_counter, straightflush_counter/play * 100, "0,00139"],
-            ["RoyalFlush", royalflush_counter, royalflush_counter/play * 100, "0,000154"],
-            ["Spielzuege", play],
-        ]
-        headers = ["Kombination", "Anzahl", "Prozentsatz (berechnet)", "Prozentsatz (Wikipedia)"]
-        print(tabulate(table_data, headers=headers, tablefmt="grid"))
+    for _ in range(play):
+        random_cards = pickOneCard(gamecards, 5) #Hole 5 Zufallszahlen
+        sorted_cards = sorted(random_cards, key=lambda x: x[1]) #Katen sortieren
+        highcard_counter += highcard(sorted_cards)
+        twopairs_counter += twopairs(sorted_cards)
+        if twopairs(sorted_cards) == 0:
+            pair_counter += pairs(sorted_cards)
+        drilling_counter += drilling(sorted_cards)
+        street_counter += street(sorted_cards)
+        flush_counter += flush(sorted_cards)
+        fullhouse_counter += fullhouse(sorted_cards)
+        fourofakind_counter += fourofakind(sorted_cards)
+        straightflush_counter += straightflush(sorted_cards)
+        royalflush_counter += royalflush(sorted_cards)
+
+        if _ == play - 1:
+            table_data = [
+                ["HighCard", highcard_counter, "{:.2f}%".format(highcard_counter/play * 100), "50.12%"],
+                ["Paar", pair_counter, "{:.2f}%".format(pair_counter/play * 100), "42.26%"],
+                ["ZweiPaar", twopairs_counter, "{:.2f}%".format(twopairs_counter/play * 100), "4.75%"],
+                ["Drilling", drilling_counter, "{:.2f}%".format(drilling_counter/play * 100), "2.11%"],
+                ["Straße", street_counter, "{:.2f}%".format(street_counter/play * 100), "0.392%"],
+                ["Flush", flush_counter, "{:.2f}%".format(flush_counter/play * 100), "0.197%"],
+                ["FullHouse", fullhouse_counter, "{:.2f}%".format(fullhouse_counter/play * 100), "0.144%"],
+                ["Vierling", fourofakind_counter, "{:.2f}%".format(fourofakind_counter/play * 100), "0.0240%"],
+                ["StraightFlush", straightflush_counter, "{:.2f}%".format(straightflush_counter/play * 100), "0.00139%"],
+                ["RoyalFlush", royalflush_counter, "{:.2f}%".format(royalflush_counter/play * 100), "0.000154%"],
+                ["Spielzuege", play],
+            ]
+            headers = ["Kombination", "Anzahl", "Prozentsatz (berechnet)", "Prozentsatz (Wikipedia)"]
+            print(tabulate(table_data, headers=headers, tablefmt="grid"))
+
+if __name__ == "__main__":
+    play_methode(1000)
