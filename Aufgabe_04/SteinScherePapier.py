@@ -1,4 +1,6 @@
 import random
+import json
+import requests
 
 from matplotlib import pyplot as plt
 
@@ -87,7 +89,7 @@ def statistic():
 
 if __name__ == "__main__":
     play = 0
-    rounds = 10
+    rounds = 5
     win_count = {"person": 0, "computer": 0, "unentschieden": 0}
     person_symbol = {"rock": 0, "paper": 0, "scissors": 0, "spock": 0, "lizard": 0}
     while play < rounds:
@@ -112,6 +114,13 @@ if __name__ == "__main__":
     print("\nEndgültige meschengewählte Symbole-Statistik:")
     for symbol, anzahl in person_symbol.items():
         print(f"{symbol}: {anzahl}")
+    # Daten als JSON speichern
+    with open("endgueltige_statistik.json", "w") as json_file:
+        json.dump(person_symbol, json_file, indent=4)
+        url = 'http://127.0.0.1:5000/json_example'
+        query = json.dumps(person_symbol)
+        res = requests.post(url, data=query)
+        print(res.text)
 
     statistic()
 
