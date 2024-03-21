@@ -8,7 +8,6 @@ connection = sqlite3.connect("Datenbank.db")
 def start():
     return "Hallo, Welt!"
 
-
 @app.route('/json_example', methods=['POST'])
 def handle_json():
     cursor = connection.cursor()
