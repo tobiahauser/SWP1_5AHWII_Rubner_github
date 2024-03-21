@@ -4,7 +4,6 @@ import requests
 
 from matplotlib import pyplot as plt
 
-
 def person_picked(input: str):
     input = input.lower()
     if (input == "rock"):
